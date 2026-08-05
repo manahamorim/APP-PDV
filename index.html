@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>realme | Materiais de Positivação</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffc915">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Positivação">
+
+  <style>
+    :root {
+      --primary: #ffc915;
+      --primary-dark: #e6b400;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e2e5ea;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+    .wrap { max-width: 520px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header .logo {
+      display: inline-block;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 800;
+      font-size: 30px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .header .logo::after {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+      margin: 6px auto 0;
+    }
+    .header h1 { font-size: 18px; margin: 0; }
+    .header p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(20, 30, 60, 0.08);
+      padding: 28px 24px;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #eef1f8;
+      border-radius: 10px;
+      padding: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 6px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .tab-btn.active { background: var(--primary); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+    .progress {
+      height: 6px;
+      background: #eef1f8;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 33%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width .25s ease;
+    }
+    .step-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 4px;
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .step-title { font-size: 19px; margin: 0 0 18px; }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    .field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    input[type=text], input[type=email], input[type=number], input[type=tel], textarea, select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--text);
+      box-shadow: 0 0 0 3px rgba(255,201,21,.35);
+    }
+    input.error, textarea.error, select.error { border-color: var(--danger); }
+    .error-msg { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
+    textarea { resize: vertical; min-height: 70px; }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .actions { display: flex; gap: 10px; margin-top: 22px; }
+    .btn {
+      flex: 1;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .05s ease, opacity .15s ease;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: var(--text); }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-secondary { background: #eef1f8; color: #374151; flex: 0 0 auto; padding: 13px 18px; }
+
+    .hidden { display: none !important; }
+
+    .review-list { list-style: none; margin: 0 0 4px; padding: 0; }
+    .review-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .review-list li span:first-child { color: var(--muted); }
+    .review-list li span:last-child { font-weight: 600; text-align: right; }
+
+    .success-box { text-align: center; padding: 8px 0 4px; }
+    .success-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: #e6f4ea;
+      color: var(--success);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 14px;
+    }
+    .success-box h2 { font-size: 18px; margin: 0 0 6px; }
+    .success-box p { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
+    .id-chip {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: #eef1f8;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      font-size: 15px;
+    }
+
+    .banner-error {
+      background: #fdecea;
+      color: var(--danger);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .file-drop {
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      padding: 22px 14px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .file-drop:hover { border-color: var(--primary); color: var(--text); }
+    .file-list { margin-top: 10px; font-size: 12px; color: #374151; }
+    .file-list div { padding: 4px 0; display: flex; justify-content: space-between; }
+
+    .item-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+    .item-row .item-material { flex: 1 1 auto; }
+    .item-row .item-qty { flex: 0 0 84px; }
+    .item-row .f_item_outro { margin-top: 6px; }
+    .item-row .item-remove {
+      flex: 0 0 auto;
+      width: 38px; height: 38px;
+      margin-top: 22px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .item-row .item-remove:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-add-item {
+      display: block;
+      width: 100%;
+      border: 1.5px dashed var(--border);
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    .btn-add-item:hover { border-color: var(--primary); }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(26,26,26,.25);
+      border-top-color: #1a1a1a;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin .7s linear infinite;
+      vertical-align: -3px;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .pedido-card {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .pedido-card:hover { border-color: var(--primary); background: #fffbf0; }
+    .pedido-card.selected { border-color: var(--primary); background: #fff8e1; }
+    .pedido-card .pedido-id { font-weight: 700; font-size: 13px; }
+    .pedido-card .pedido-material { font-size: 12px; color: var(--muted); margin: 3px 0 6px; }
+    .pedido-card .pedido-status {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #e6f4ea;
+      color: var(--success);
+    }
+    .pedidos-empty { font-size: 13px; color: var(--muted); padding: 4px 0 14px; }
+    .fotos-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0 16px;
+    }
+    .fotos-divider::before, .fotos-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">realme</div>
+      <h1>Trade &middot; Materiais de Positivação</h1>
+      <p>Solicite materiais e acompanhe o envio de fotos</p>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn" id="tabSolicitar">Solicitar material</button>
+        <button class="tab-btn" id="tabFotos">Enviar fotos</button>
+      </div>
+
+      <!-- ===================== VIEW: SOLICITAR ===================== -->
+      <div id="viewSolicitar">
+        <div id="wizardArea">
+          <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+          <p class="step-label" id="stepLabel">Passo 1 de 3</p>
+
+          <div class="banner-error" id="reqBanner"></div>
+
+          <!-- Step 1 -->
+          <div id="step1">
+            <h2 class="step-title">Seus dados</h2>
+            <div class="field">
+              <label for="f_email">E-mail *</label>
+              <input type="email" id="f_email" placeholder="voce@empresa.com">
+              <div class="error-msg">Informe um e-mail válido.</div>
+            </div>
+            <div class="field">
+              <label for="f_solicitante">Solicitante *</label>
+              <input type="text" id="f_solicitante" placeholder="Seu nome completo">
+              <div class="error-msg">Informe o nome do solicitante.</div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f_telefone">Telefone *</label>
+                <input type="tel" id="f_telefone" placeholder="(11) 99999-9999">
+                <div class="error-msg">Informe um telefone.</div>
+              </div>
+              <div class="field">
+                <label for="f_regiao">Região *</label>
+                <input type="text" id="f_regiao" placeholder="Ex: SP - Zona Sul">
+                <div class="error-msg">Informe a região.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="step2" class="hidden">
+            <h2 class="step-title">Detalhes do material</h2>
+            <div class="row2">
+              <div class="field">
+                <label for="f_rede">Rede / Loja *</label>
+                <input type="text" id="f_rede" placeholder="Nome da loja/cliente">
+                <div class="error-msg">Informe a rede ou loja.</div>
+              </div>
+              <div class="field">
+                <label for="f_qtdLojas">Nº de lojas *</label>
+                <input type="number" id="f_qtdLojas" min="1" placeholder="Ex: 5">
+                <div class="error-msg">Informe o número de lojas.</div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="f_periodo">Período de cobertura *</label>
+              <input type="text" id="f_periodo" placeholder="Ex: Agosto/2026">
+              <div class="error-msg">Informe o período de cobertura.</div>
+            </div>
+            <div class="field">
+              <label>Itens solicitados *</label>
+              <div id="itemsContainer"></div>
+              <div class="error-msg" id="itemsError">Selecione o material e informe uma quantidade válida em todos os itens.</div>
+              <button type="button" class="btn-add-item" id="btnAddItem">+ Adicionar item</button>
+            </div>
+            <div class="field">
+              <label for="f_finalidade">Finalidade de uso *</label>
+              <textarea id="f_finalidade" placeholder="Para que o material será usado"></textarea>
+              <div class="error-msg">Informe a finalidade de uso.</div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="step3" class="hidden">
+            <h2 class="step-title">Entrega e revisão</h2>
+            <div class="field">
+              <label for="f_endereco">Endereço *</label>
+              <textarea id="f_endereco" placeholder="Endereço completo de entrega"></textarea>
+              <div class="error-msg">Informe o endereço.</div>
+            </div>
+            <div class="field">
+              <label for="f_observacoes">Observações</label>
+              <textarea id="f_observacoes" placeholder="Opcional"></textarea>
+            </div>
+            <ul class="review-list" id="reviewList"></ul>
+          </div>
+
+          <!-- Success -->
+          <div id="stepSuccess" class="hidden">
+            <div class="success-box">
+              <div class="success-icon">&#10003;</div>
+              <h2>Solicitação enviada!</h2>
+              <p>Sua solicitação foi registrada e enviada para aprovação.</p>
+              <p>Guarde o código abaixo &mdash; você vai precisar dele para enviar as fotos depois.</p>
+              <div class="id-chip" id="successId">-</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" id="btnNovaSolicitacao">Fazer nova solicitação</button>
+            </div>
+          </div>
+
+          <div class="actions" id="wizardActions">
+            <button class="btn btn-secondary hidden" id="btnBack">Voltar</button>
+            <button class="btn btn-primary" id="btnNext">Próximo &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== VIEW: FOTOS ===================== -->
+      <div id="viewFotos" class="hidden">
+        <h2 class="step-title">Enviar fotos da positivação</h2>
+        <p class="sub" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;">Disponível depois que seu pedido é aprovado.</p>
+        <div class="banner-error" id="fotoBanner"></div>
+
+        <div id="fotoForm">
+          <div class="field">
+            <label for="f_fotoEmail">Seu e-mail *</label>
+            <input type="email" id="f_fotoEmail" placeholder="voce@empresa.com">
+            <div class="field .hint" style="font-size:12px;color:var(--muted);margin-top:4px;">Buscamos seus pedidos já aprovados para você escolher.</div>
+          </div>
+          <div class="actions" style="margin-top:10px;margin-bottom:4px;">
+            <button type="button" class="btn btn-secondary" id="btnBuscarPedidos" style="flex:1">Buscar meus pedidos aprovados</button>
+          </div>
+          <div id="pedidosAprovadosList"></div>
+
+          <div class="fotos-divider">ou informe o ID manualmente</div>
+
+          <div class="field">
+            <label for="f_fotoId">ID da solicitação *</label>
+            <input type="text" id="f_fotoId" placeholder="Ex: F6CF2729" style="text-transform:uppercase">
+            <div class="error-msg">Informe o ID da solicitação (veio no e-mail de rastreio) ou selecione um pedido acima.</div>
+          </div>
+          <div class="field">
+            <label>Fotos da positivação *</label>
+            <div class="file-drop" id="fileDrop">Toque para escolher uma ou mais fotos</div>
+            <input type="file" id="f_fotoInput" accept="image/*" multiple class="hidden">
+            <div class="file-list" id="fileList"></div>
+            <div class="error-msg" id="fotoFileError">Selecione ao menos uma foto.</div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="btnEnviarFotos">Enviar fotos</button>
+          </div>
+        </div>
+
+        <div id="fotoSuccess" class="hidden">
+          <div class="success-box">
+            <div class="success-icon">&#10003;</div>
+            <h2>Fotos enviadas!</h2>
+            <p>Recebemos suas fotos da positivação. Obrigado!</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="btnNovoEnvioFoto">Enviar outra foto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------
+    // Config (página estática — sem templating do Apps Script)
+    // ---------------------------------------------------------------
+    var params = new URLSearchParams(location.search);
+    var PRESET_ID = params.get('id') || '';
+    var INITIAL_VIEW = params.get('view') === 'fotos' ? 'fotos' : 'solicitar';
+    var AUTH_EMAIL = params.get('authEmail') || '';
+    var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwvyAAD9zHy-T4ItarGMEphtTR3kWG5SgUUWzO4kVWaQj6K3lPF8BP7GTpn_dr0nUk/exec';
+
+    function callApi_(action, payload) {
+      return fetch(WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: action, payload: payload })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.error || 'Erro desconhecido.');
+          return res.result;
+        });
+    }
+
+    // ---------------------------------------------------------------
+    // Tabs / view switching
+    // ---------------------------------------------------------------
+    var tabSolicitar = document.getElementById('tabSolicitar');
+    var tabFotos = document.getElementById('tabFotos');
+    var viewSolicitar = document.getElementById('viewSolicitar');
+    var viewFotos = document.getElementById('viewFotos');
+
+    function showView(view) {
+      if (view === 'fotos') {
+        tabFotos.classList.add('active');
+        tabSolicitar.classList.remove('active');
+        viewFotos.classList.remove('hidden');
+        viewSolicitar.classList.add('hidden');
+      } else {
+        tabSolicitar.classList.add('active');
+        tabFotos.classList.remove('active');
+        viewSolicitar.classList.remove('hidden');
+        viewFotos.classList.add('hidden');
+      }
+    }
+    tabSolicitar.addEventListener('click', function () { showView('solicitar'); });
+    tabFotos.addEventListener('click', function () { showView('fotos'); });
+
+    // ---------------------------------------------------------------
+    // Wizard (Solicitar material)
+    // ---------------------------------------------------------------
+    var currentStep = 1;
+    var TOTAL_STEPS = 3;
+    var stepEls = { 1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3') };
+    var progressBar = document.getElementById('progressBar');
+    var stepLabel = document.getElementById('stepLabel');
+    var btnBack = document.getElementById('btnBack');
+    var btnNext = document.getElementById('btnNext');
+    var wizardActions = document.getElementById('wizardActions');
+    var reqBanner = document.getElementById('reqBanner');
+
+    var stepFields = {
+      1: ['f_email', 'f_solicitante', 'f_telefone', 'f_regiao'],
+      2: ['f_rede', 'f_qtdLojas', 'f_periodo', 'f_finalidade'],
+      3: ['f_endereco']
+    };
+
+    function fieldEl(id) { return document.getElementById(id); }
+
+    // ---------------------------------------------------------------
+    // Itens solicitados (material + quantidade, repetível)
+    // ---------------------------------------------------------------
+    var MATERIAL_OPTIONS = [
+      'Pôster',
+      'Panfleto',
+      'Bexiga',
+      'Papel cartão A4 de exibição',
+      'Porta folheto A4',
+      'Info Card',
+      'IOT (brinde)',
+      'Mousepad (brinde)',
+      'Chaveiro (brinde)',
+      'Panfleto (fabricado localmente)',
+      'Banner de exposição (grande)',
+      'Adesivo de balcão de loja',
+      'Banner',
+      'Porta Banner',
+      'Mesa de experiência (3300×2400mm)',
+      'Shop in shop (1100×535×1100mm)',
+      'Balcão com KV (900×450×1300mm)',
+      'Conjunto mesa-balcão (900×450×1300mm + 1600×900×900mm)',
+      'Mesa de experiência (1200/1600/2000×900mm)'
+    ];
+
+    function materialOptionsHtml(selected) {
+      var html = '<option value="">Selecione...</option>';
+      MATERIAL_OPTIONS.forEach(function (m) {
+        html += '<option value="' + m.replace(/"/g, '&quot;') + '"' + (m === selected ? ' selected' : '') + '>' + m + '</option>';
+      });
+      html += '<option value="__outro__"' + (selected === '__outro__' ? ' selected' : '') + '>Outro (especificar)</option>';
+      return html;
+    }
+
+    function addItemRow(material, quantidade) {
+      var wrap = document.createElement('div');
+      wrap.className = 'item-row';
+      wrap.innerHTML =
+        '<div class="field item-material">' +
+          '<label>Material *</label>' +
+          '<select class="f_item_material">' + materialOptionsHtml(material || '') + '</select>' +
+          '<input type="text" class="f_item_outro hidden" placeholder="Especifique o material">' +
+        '</div>' +
+        '<div class="field item-qty">' +
+          '<label>Qtd. *</label>' +
+          '<input type="number" min="1" class="f_item_qtd" placeholder="Ex: 10" value="' + (quantidade || '') + '">' +
+        '</div>' +
+        '<button type="button" class="item-remove" title="Remover item">&times;</button>';
+
+      var sel = wrap.querySelector('.f_item_material');
+      var outroInput = wrap.querySelector('.f_item_outro');
+
+      if (material && MATERIAL_OPTIONS.indexOf(material) === -1) {
+        sel.value = '__outro__';
+        outroInput.value = material;
+      }
+      outroInput.classList.toggle('hidden', sel.value !== '__outro__');
+
+      sel.addEventListener('change', function () {
+        outroInput.classList.toggle('hidden', sel.value !== '__outro__');
+        if (sel.value !== '__outro__') outroInput.value = '';
+        sel.classList.remove('error');
+        outroInput.classList.remove('error');
+      });
+
+      wrap.querySelector('.item-remove').addEventListener('click', function () {
+        if (document.querySelectorAll('#itemsContainer .item-row').length <= 1) return;
+        wrap.remove();
+      });
+
+      document.getElementById('itemsContainer').appendChild(wrap);
+    }
+
+    document.getElementById('btnAddItem').addEventListener('click', function () {
+      addItemRow();
+    });
+
+    function collectItems() {
+      var rows = document.querySelectorAll('#itemsContainer .item-row');
+      var items = [];
+      rows.forEach(function (rowEl) {
+        var sel = rowEl.querySelector('.f_item_material');
+        var qty = rowEl.querySelector('.f_item_qtd');
+        var outro = rowEl.querySelector('.f_item_outro');
+        var material = sel.value === '__outro__' ? outro.value.trim() : sel.value;
+        items.push({ material: material, quantidade: qty.value.trim() });
+      });
+      return items;
+    }
+
+    function validateItems() {
+      var rows = document.querySelectorAll('#itemsContainer .item-row');
+      var allOk = true;
+      rows.forEach(function (rowEl) {
+        var sel = rowEl.querySelector('.f_item_material');
+        var qty = rowEl.querySelector('.f_item_qtd');
+        var outro = rowEl.querySelector('.f_item_outro');
+        var matVal = sel.value === '__outro__' ? outro.value.trim() : sel.value;
+        var matOk = matVal.length > 0;
+        var qtyOk = qty.value.trim().length > 0 && Number(qty.value) > 0;
+        sel.classList.toggle('error', !matOk);
+        if (sel.value === '__outro__') {
+          outro.classList.toggle('error', !matOk);
+        } else {
+          outro.classList.remove('error');
+        }
+        qty.classList.toggle('error', !qtyOk);
+        if (!matOk || !qtyOk) allOk = false;
+      });
+      var errEl = document.getElementById('itemsError');
+      if (errEl) errEl.style.display = allOk ? 'none' : 'block';
+      return allOk;
+    }
+
+    function validateField(id) {
+      var el = fieldEl(id);
+      var val = el.value.trim();
+      var ok = val.length > 0;
+      if (id === 'f_email' && ok) {
+        ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      }
+      if (id === 'f_qtdLojas' || id === 'f_quantidade') {
+        ok = ok && Number(val) > 0;
+      }
+      var errorMsg = el.parentElement.querySelector('.error-msg');
+      if (!ok) {
+        el.classList.add('error');
+        if (errorMsg) errorMsg.style.display = 'block';
+      } else {
+        el.classList.remove('error');
+        if (errorMsg) errorMsg.style.display = 'none';
+      }
+      return ok;
+    }
+
+    function validateStep(step) {
+      var fields = stepFields[step] || [];
+      var allOk = true;
+      fields.forEach(function (id) {
+        if (!validateField(id)) allOk = false;
+      });
+      if (step === 2 && !validateItems()) allOk = false;
+      return allOk;
+    }
+
+    function updateReview() {
+      var data = collectData();
+      var list = document.getElementById('reviewList');
+      var rows = [
+        ['Solicitante', data.solicitante],
+        ['E-mail', data.email],
+        ['Telefone', data.telefone],
+        ['Região', data.regiao],
+        ['Rede/Loja', data.rede],
+        ['Nº de lojas', data.qtdLojas],
+        ['Período', data.periodoCobertura]
+      ];
+      (data.items || []).forEach(function (it, i) {
+        rows.push(['Item ' + (i + 1), (it.material || '-') + ' — ' + (it.quantidade || '-') + ' un.']);
+      });
+      list.innerHTML = rows.map(function (r) {
+        return '<li><span>' + r[0] + '</span><span>' + (r[1] || '-') + '</span></li>';
+      }).join('');
+    }
+
+    function showStep(step) {
+      currentStep = step;
+      for (var k in stepEls) {
+        stepEls[k].classList.toggle('hidden', Number(k) !== step);
+      }
+      progressBar.style.width = Math.round((step / TOTAL_STEPS) * 100) + '%';
+      stepLabel.textContent = 'Passo ' + step + ' de ' + TOTAL_STEPS;
+      btnBack.classList.toggle('hidden', step === 1);
+      btnNext.textContent = step === TOTAL_STEPS ? 'Enviar solicitação' : 'Próximo →';
+      if (step === TOTAL_STEPS) updateReview();
+      reqBanner.style.display = 'none';
+    }
+
+    btnBack.addEventListener('click', function () {
+      if (currentStep > 1) showStep(currentStep - 1);
+    });
+
+    btnNext.addEventListener('click', function () {
+      if (!validateStep(currentStep)) return;
+      if (currentStep < TOTAL_STEPS) {
+        showStep(currentStep + 1);
+        return;
+      }
+      submitRequest();
+    });
+
+    function collectData() {
+      return {
+        email: fieldEl('f_email').value.trim(),
+        solicitante: fieldEl('f_solicitante').value.trim(),
+        telefone: fieldEl('f_telefone').value.trim(),
+        regiao: fieldEl('f_regiao').value.trim(),
+        rede: fieldEl('f_rede').value.trim(),
+        qtdLojas: fieldEl('f_qtdLojas').value.trim(),
+        periodoCobertura: fieldEl('f_periodo').value.trim(),
+        items: collectItems(),
+        finalidade: fieldEl('f_finalidade').value.trim(),
+        endereco: fieldEl('f_endereco').value.trim(),
+        observacoes: fieldEl('f_observacoes').value.trim()
+      };
+    }
+
+    function submitRequest() {
+      btnNext.disabled = true;
+      btnBack.disabled = true;
+      btnNext.innerHTML = '<span class="spinner"></span>Enviando...';
+      reqBanner.style.display = 'none';
+
+      var dataToSend = collectData();
+      callApi_('submitMaterialRequest', dataToSend)
+        .then(function (res) {
+          document.getElementById('step3').classList.add('hidden');
+          document.getElementById('stepSuccess').classList.remove('hidden');
+          wizardActions.classList.add('hidden');
+          document.getElementById('progressBar').style.width = '100%';
+          document.getElementById('stepLabel').textContent = 'Concluído';
+          document.getElementById('successId').textContent = res.id;
+          lastSubmittedEmail = dataToSend.email;
+          if (fotoEmailInput && !fotoEmailInput.value) fotoEmailInput.value = lastSubmittedEmail;
+        })
+        .catch(function (err) {
+          btnNext.disabled = false;
+          btnBack.disabled = false;
+          btnNext.textContent = 'Enviar solicitação';
+          reqBanner.textContent = 'Não foi possível enviar: ' + (err && err.message ? err.message : err);
+          reqBanner.style.display = 'block';
+        });
+    }
+
+    document.getElementById('btnNovaSolicitacao').addEventListener('click', function () {
+      ['f_email','f_solicitante','f_telefone','f_regiao','f_rede','f_qtdLojas','f_periodo','f_finalidade','f_endereco','f_observacoes'].forEach(function(id){
+        fieldEl(id).value = '';
+        fieldEl(id).classList.remove('error');
+      });
+      document.getElementById('itemsContainer').innerHTML = '';
+      addItemRow();
+      document.getElementById('stepSuccess').classList.add('hidden');
+      document.getElementById('step1').classList.remove('hidden');
+      wizardActions.classList.remove('hidden');
+      btnNext.disabled = false;
+      btnBack.disabled = false;
+      showStep(1);
+    });
+
+    // ---------------------------------------------------------------
+    // Fotos view
+    // ---------------------------------------------------------------
+    var lastSubmittedEmail = '';
+    var fotoEmailInput = document.getElementById('f_fotoEmail');
+    var btnBuscarPedidos = document.getElementById('btnBuscarPedidos');
+    var pedidosAprovadosList = document.getElementById('pedidosAprovadosList');
+    var fotoIdInput = document.getElementById('f_fotoId');
+    var fileDrop = document.getElementById('fileDrop');
+    var fileInput = document.getElementById('f_fotoInput');
+    var fileList = document.getElementById('fileList');
+    var fotoBanner = document.getElementById('fotoBanner');
+    var btnEnviarFotos = document.getElementById('btnEnviarFotos');
+    var selectedFiles = [];
+
+    function renderPedidosList(pedidos) {
+      if (!pedidos || !pedidos.length) {
+        pedidosAprovadosList.innerHTML = '<p class="pedidos-empty">Nenhum pedido aprovado encontrado para este e-mail ainda. Assim que seu pedido for aprovado, ele aparece aqui.</p>';
+        return;
+      }
+      pedidosAprovadosList.innerHTML = pedidos.map(function (p) {
+        return '<div class="pedido-card" data-id="' + p.id + '">' +
+          '<div class="pedido-id">' + p.id + '</div>' +
+          '<div class="pedido-material">' + (p.material || '') + '</div>' +
+          '<span class="pedido-status">' + p.status + '</span>' +
+          '</div>';
+      }).join('');
+      Array.prototype.forEach.call(pedidosAprovadosList.querySelectorAll('.pedido-card'), function (card) {
+        card.addEventListener('click', function () {
+          Array.prototype.forEach.call(pedidosAprovadosList.querySelectorAll('.pedido-card'), function (c) {
+            c.classList.remove('selected');
+          });
+          card.classList.add('selected');
+          fotoIdInput.value = card.getAttribute('data-id');
+          fotoIdInput.classList.remove('error');
+          fotoIdInput.parentElement.querySelector('.error-msg').style.display = 'none';
+        });
+      });
+    }
+
+    function buscarMeusPedidos() {
+      var email = fotoEmailInput.value.trim();
+      if (!email) {
+        fotoBanner.textContent = 'Informe seu e-mail para buscar seus pedidos aprovados.';
+        fotoBanner.style.display = 'block';
+        return;
+      }
+      fotoBanner.style.display = 'none';
+      btnBuscarPedidos.disabled = true;
+      btnBuscarPedidos.innerHTML = '<span class="spinner"></span>Buscando...';
+      callApi_('getMinhasSolicitacoes', { email: email })
+        .then(function (pedidos) {
+          btnBuscarPedidos.disabled = false;
+          btnBuscarPedidos.textContent = 'Buscar meus pedidos aprovados';
+          renderPedidosList(pedidos);
+        })
+        .catch(function (err) {
+          btnBuscarPedidos.disabled = false;
+          btnBuscarPedidos.textContent = 'Buscar meus pedidos aprovados';
+          fotoBanner.textContent = err.message || String(err);
+          fotoBanner.style.display = 'block';
+        });
+    }
+
+    btnBuscarPedidos.addEventListener('click', buscarMeusPedidos);
+
+    fileDrop.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+      selectedFiles = Array.prototype.slice.call(fileInput.files);
+      renderFileList();
+    });
+
+    function renderFileList() {
+      if (!selectedFiles.length) {
+        fileList.innerHTML = '';
+        return;
+      }
+      fileList.innerHTML = selectedFiles.map(function (f) {
+        var kb = Math.round(f.size / 1024);
+        return '<div><span>' + f.name + '</span><span>' + kb + ' KB</span></div>';
+      }).join('');
+    }
+
+    function fileToBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var result = reader.result;
+          var base64 = result.split(',')[1];
+          resolve({ name: file.name, mimeType: file.type || 'image/jpeg', data: base64 });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    btnEnviarFotos.addEventListener('click', function () {
+      var id = fotoIdInput.value.trim().toUpperCase();
+      var idOk = id.length > 0;
+      var filesOk = selectedFiles.length > 0;
+
+      fotoIdInput.classList.toggle('error', !idOk);
+      fotoIdInput.parentElement.querySelector('.error-msg').style.display = idOk ? 'none' : 'block';
+      document.getElementById('fotoFileError').style.display = filesOk ? 'none' : 'block';
+
+      if (!idOk || !filesOk) return;
+
+      fotoBanner.style.display = 'none';
+      btnEnviarFotos.disabled = true;
+      btnEnviarFotos.innerHTML = '<span class="spinner"></span>Enviando...';
+
+      Promise.all(selectedFiles.map(fileToBase64)).then(function (filesData) {
+        callApi_('submitPhotoSubmission', { id: id, files: filesData })
+          .then(function () {
+            document.getElementById('fotoForm').classList.add('hidden');
+            document.getElementById('fotoSuccess').classList.remove('hidden');
+          })
+          .catch(function (err) {
+            btnEnviarFotos.disabled = false;
+            btnEnviarFotos.textContent = 'Enviar fotos';
+            fotoBanner.textContent = 'Não foi possível enviar: ' + (err && err.message ? err.message : err);
+            fotoBanner.style.display = 'block';
+          });
+      }).catch(function (err) {
+        btnEnviarFotos.disabled = false;
+        btnEnviarFotos.textContent = 'Enviar fotos';
+        fotoBanner.textContent = 'Erro ao ler os arquivos selecionados.';
+        fotoBanner.style.display = 'block';
+      });
+    });
+
+    document.getElementById('btnNovoEnvioFoto').addEventListener('click', function () {
+      selectedFiles = [];
+      fileInput.value = '';
+      renderFileList();
+      fotoIdInput.value = '';
+      pedidosAprovadosList.innerHTML = '';
+      document.getElementById('fotoSuccess').classList.add('hidden');
+      document.getElementById('fotoForm').classList.remove('hidden');
+      btnEnviarFotos.disabled = false;
+      btnEnviarFotos.textContent = 'Enviar fotos';
+      if (fotoEmailInput.value) buscarMeusPedidos();
+    });
+
+    // ---------------------------------------------------------------
+    // Service worker (instalabilidade da PWA)
+    // ---------------------------------------------------------------
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').catch(function () {});
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Init
+    // ---------------------------------------------------------------
+    if (PRESET_ID) {
+      fotoIdInput.value = PRESET_ID;
+    }
+    if (AUTH_EMAIL) {
+      fotoEmailInput.value = AUTH_EMAIL;
+      fieldEl('f_email').value = AUTH_EMAIL;
+    }
+    if (fotoEmailInput.value) buscarMeusPedidos();
+    addItemRow();
+    showStep(1);
+    showView(INITIAL_VIEW);
+  </script>
+</body>
+</html>
