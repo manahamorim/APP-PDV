@@ -17,12 +17,15 @@ jobs:
           base64 -d asset-src/realme-logo.b64 > realme-logo.png
           base64 -d asset-src/realmeow.b64 > realmeow.png
           base64 -d asset-src/icon-192.b64 > icon-192.png
+          mkdir -p fonts
+          base64 -d asset-src/gilroy-light.b64 > fonts/Gilroy-Light.woff2
+          base64 -d asset-src/gilroy-extrabold.b64 > fonts/Gilroy-ExtraBold.woff2
           ls -la realme-logo.png realmeow.png icon-192.png
 
       - name: Commit and push generated PNGs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add realme-logo.png realmeow.png icon-192.png
+          git add realme-logo.png realmeow.png icon-192.png fonts/Gilroy-Light.woff2 fonts/Gilroy-ExtraBold.woff2
           git diff --cached --quiet || git commit -m "Apply personalized logo and mascot images"
           git push
