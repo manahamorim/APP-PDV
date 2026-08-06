@@ -1,6 +1,6 @@
 {
-  "name": "Trade | Materiais de Positivação",
-  "short_name": "Positivação",
+  "name": "PDV realme",
+  "short_name": "PDV realme",
   "description": "Solicite materiais de positivação e envie fotos de instalação.",
   "start_url": "./index.html",
   "scope": "./",
