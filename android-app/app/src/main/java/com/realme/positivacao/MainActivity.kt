@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -15,9 +13,12 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 
 /**
- * Tela principal: WebView carregando a PWA (GitHub Pages), já autenticada
- * (login feito na LoginActivity). Suporta upload de arquivo (para o campo
- * "Fotos da positivação") via onShowFileChooser.
+ * Tela principal: WebView carregando a PWA (GitHub Pages). O login,
+ * a troca de senha obrigatoria no primeiro acesso e o "esqueci a senha"
+ * agora acontecem inteiramente dentro da PWA (ver pwa/index.html), entao
+ * este WebView so abre a URL raiz - sem parametros de autenticacao.
+ * Suporta upload de arquivo (para o campo "Fotos da positivacao") via
+ * onShowFileChooser.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -38,9 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.webView)
         progressBar = findViewById(R.id.progressBar)
-
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        val email = prefs.getString("email", "") ?: ""
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
@@ -75,9 +73,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val separator = if (WEB_URL.contains("?")) "&" else "?"
-        val url = WEB_URL + separator + "authEmail=" + Uri.encode(email)
-        webView.loadUrl(url)
+        webView.loadUrl(WEB_URL)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -92,21 +88,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_logout) {
-            getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {
