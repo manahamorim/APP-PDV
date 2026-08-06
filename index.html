@@ -13,7 +13,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Positivação">
-
   <style>
     :root {
       --primary: #ffc915;
@@ -295,6 +294,41 @@
       height: 1px;
       background: var(--border);
     }
+
+    .link-btn {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: var(--text); font-weight: 600; font-size: 13px; text-decoration: underline;
+    }
+    .center { text-align: center; }
+    .radio-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+    .radio-option {
+      display: flex; align-items: flex-start; gap: 10px;
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 12px;
+      cursor: pointer; font-size: 13px;
+    }
+    .radio-option.selected { border-color: var(--primary); background: #fffbf0; }
+    .radio-option input { margin-top: 2px; }
+    .radio-option .opt-title { font-weight: 700; display: block; }
+    .radio-option .opt-sub { color: var(--muted); font-size: 12px; }
+    .addr-preview {
+      background: #f4f6fb; border-radius: 9px; padding: 10px 12px;
+      font-size: 13px; color: #374151; margin-top: 8px; line-height: 1.5;
+    }
+    .badge-status {
+      display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
+      border-radius: 6px; background: #eef1f8; color: #374151;
+    }
+    .badge-status.ok { background: #e6f4ea; color: var(--success); }
+    .badge-status.warn { background: #fff8e1; color: #8a6d00; }
+    .badge-status.bad { background: #fdecea; color: var(--danger); }
+    .hist-card {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+    }
+    .hist-card .hist-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .hist-card .hist-id { font-weight: 700; font-size: 13px; }
+    .hist-card .hist-material { font-size: 12px; color: var(--muted); margin: 5px 0 8px; }
+    .photo-picker-row { display: flex; gap: 10px; }
+    .photo-picker-row .file-drop { flex: 1; }
   </style>
 </head>
 <body>
@@ -308,10 +342,58 @@
       <p>Solicite materiais e acompanhe o envio de fotos</p>
     </div>
 
-    <div class="card">
+    <!-- ===================== LOGIN GATE ===================== -->
+    <div class="card" id="loginCard">
+      <h2 class="step-title" id="loginTitle">Entrar</h2>
+      <div class="banner-error" id="loginBanner"></div>
+      <div id="loginForm">
+        <div class="field">
+          <label for="f_loginEmail">E-mail *</label>
+          <input type="email" id="f_loginEmail" placeholder="voce@empresa.com">
+        </div>
+        <div class="field">
+          <label for="f_loginSenha">Senha *</label>
+          <input type="password" id="f_loginSenha" placeholder="Sua senha">
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btnLogin">Entrar</button>
+        </div>
+        <p class="center" style="margin-top:14px;">
+          <button type="button" class="link-btn" id="btnEsqueciSenha">Esqueci a senha</button>
+        </p>
+      </div>
+
+      <!-- Troca de senha obrigatória no primeiro login -->
+      <div id="trocaSenhaForm" class="hidden">
+        <p class="sub" style="font-size:13px;color:var(--muted);margin:-6px 0 16px;">
+          Este é seu primeiro acesso (ou sua senha foi redefinida). Defina uma senha pessoal para continuar.
+        </p>
+        <div class="field">
+          <label for="f_senhaAtual">Senha atual (provisória) *</label>
+          <input type="password" id="f_senhaAtual" placeholder="Senha recebida por e-mail">
+        </div>
+        <div class="field">
+          <label for="f_novaSenha">Nova senha *</label>
+          <input type="password" id="f_novaSenha" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="field">
+          <label for="f_novaSenha2">Confirmar nova senha *</label>
+          <input type="password" id="f_novaSenha2" placeholder="Repita a nova senha">
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btnTrocarSenha">Definir senha e entrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="appCard">
+      <p class="center" style="margin:-6px 0 14px;font-size:13px;color:var(--muted);">
+        Olá, <b id="usuarioNomeLabel"></b> &middot; <button type="button" class="link-btn" id="btnLogout">sair</button>
+      </p>
       <div class="tabs">
         <button class="tab-btn" id="tabSolicitar">Solicitar material</button>
         <button class="tab-btn" id="tabFotos">Enviar fotos</button>
+        <button class="tab-btn" id="tabHistorico">Histórico</button>
       </div>
 
       <!-- ===================== VIEW: SOLICITAR ===================== -->
@@ -385,11 +467,78 @@
           <!-- Step 3 -->
           <div id="step3" class="hidden">
             <h2 class="step-title">Entrega e revisão</h2>
+
             <div class="field">
-              <label for="f_endereco">Endereço *</label>
-              <textarea id="f_endereco" placeholder="Endereço completo de entrega"></textarea>
-              <div class="error-msg">Informe o endereço.</div>
+              <label>Enviar para *</label>
+              <div class="radio-group" id="destinatarioGroup">
+                <label class="radio-option" data-tipo="proprio">
+                  <input type="radio" name="destinatarioTipo" value="proprio" checked>
+                  <span><span class="opt-title">Para mim mesmo</span><span class="opt-sub">Usa seu endereço já cadastrado</span></span>
+                </label>
+                <label class="radio-option" data-tipo="supervisor">
+                  <input type="radio" name="destinatarioTipo" value="supervisor">
+                  <span><span class="opt-title">Para um supervisor</span><span class="opt-sub">Escolha entre os supervisores já cadastrados</span></span>
+                </label>
+                <label class="radio-option" data-tipo="outro">
+                  <input type="radio" name="destinatarioTipo" value="outro">
+                  <span><span class="opt-title">Outra localização</span><span class="opt-sub">Informe o CEP e os dados do destinatário</span></span>
+                </label>
+              </div>
+              <div class="error-msg" id="destinatarioError">Selecione o destinatário.</div>
             </div>
+
+            <!-- Próprio -->
+            <div id="destProprio">
+              <div class="addr-preview" id="proprioAddrPreview">-</div>
+            </div>
+
+            <!-- Supervisor -->
+            <div id="destSupervisor" class="hidden">
+              <div class="field">
+                <label for="f_supervisorSelect">Supervisor *</label>
+                <select id="f_supervisorSelect"><option value="">Selecione...</option></select>
+                <div class="error-msg" id="supervisorError">Selecione um supervisor.</div>
+              </div>
+              <div class="addr-preview hidden" id="supervisorAddrPreview"></div>
+            </div>
+
+            <!-- Outra localização -->
+            <div id="destOutro" class="hidden">
+              <div class="row2">
+                <div class="field">
+                  <label for="f_outroCep">CEP *</label>
+                  <input type="text" id="f_outroCep" placeholder="00000-000" maxlength="9">
+                  <div class="error-msg">Informe um CEP válido.</div>
+                </div>
+                <div class="field">
+                  <label for="f_outroUf">UF</label>
+                  <input type="text" id="f_outroUf" placeholder="Preenchido pelo CEP" maxlength="2">
+                </div>
+              </div>
+              <div class="field">
+                <label for="f_outroEndereco">Endereço *</label>
+                <textarea id="f_outroEndereco" placeholder="Preenchido automaticamente pelo CEP, edite se precisar"></textarea>
+                <div class="error-msg">Informe o endereço.</div>
+              </div>
+              <div class="field">
+                <label for="f_outroNome">Nome do destinatário *</label>
+                <input type="text" id="f_outroNome" placeholder="Nome completo de quem recebe">
+                <div class="error-msg">Informe o nome do destinatário.</div>
+              </div>
+              <div class="row2">
+                <div class="field">
+                  <label for="f_outroCpf">CPF *</label>
+                  <input type="text" id="f_outroCpf" placeholder="000.000.000-00">
+                  <div class="error-msg">Informe o CPF do destinatário.</div>
+                </div>
+                <div class="field">
+                  <label for="f_outroTelefone">Telefone de contato *</label>
+                  <input type="tel" id="f_outroTelefone" placeholder="(11) 99999-9999">
+                  <div class="error-msg">Informe o telefone de contato.</div>
+                </div>
+              </div>
+            </div>
+
             <div class="field">
               <label for="f_observacoes">Observações</label>
               <textarea id="f_observacoes" placeholder="Opcional"></textarea>
@@ -444,8 +593,12 @@
           </div>
           <div class="field">
             <label>Fotos da positivação *</label>
-            <div class="file-drop" id="fileDrop">Toque para escolher uma ou mais fotos</div>
-            <input type="file" id="f_fotoInput" accept="image/*" multiple class="hidden">
+            <div class="photo-picker-row">
+              <div class="file-drop" id="fileDropGaleria">&#128247; Escolher da galeria</div>
+              <div class="file-drop" id="fileDropCamera">&#128248; Tirar foto agora</div>
+            </div>
+            <input type="file" id="f_fotoInputGaleria" accept="image/*" multiple class="hidden">
+            <input type="file" id="f_fotoInputCamera" accept="image/*" capture="environment" class="hidden">
             <div class="file-list" id="fileList"></div>
             <div class="error-msg" id="fotoFileError">Selecione ao menos uma foto.</div>
           </div>
@@ -465,6 +618,13 @@
           </div>
         </div>
       </div>
+
+      <!-- ===================== VIEW: HISTÓRICO ===================== -->
+      <div id="viewHistorico" class="hidden">
+        <h2 class="step-title">Minhas solicitações</h2>
+        <p class="sub" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;">Todas as solicitações que você já fez. Pedidos aprovados podem receber fotos da positivação.</p>
+        <div id="historicoList"></div>
+      </div>
     </div>
   </div>
 
@@ -474,8 +634,7 @@
     // ---------------------------------------------------------------
     var params = new URLSearchParams(location.search);
     var PRESET_ID = params.get('id') || '';
-    var INITIAL_VIEW = params.get('view') === 'fotos' ? 'fotos' : 'solicitar';
-    var AUTH_EMAIL = params.get('authEmail') || '';
+    var INITIAL_VIEW = params.get('view') === 'fotos' ? 'fotos' : (params.get('view') === 'historico' ? 'historico' : 'solicitar');
     var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwvyAAD9zHy-T4ItarGMEphtTR3kWG5SgUUWzO4kVWaQj6K3lPF8BP7GTpn_dr0nUk/exec';
 
     function callApi_(action, payload) {
@@ -492,28 +651,165 @@
     }
 
     // ---------------------------------------------------------------
+    // Login / autenticação
+    // ---------------------------------------------------------------
+    var CURRENT_USER = null;
+    var loginCard = document.getElementById('loginCard');
+    var appCard = document.getElementById('appCard');
+    var loginForm = document.getElementById('loginForm');
+    var trocaSenhaForm = document.getElementById('trocaSenhaForm');
+    var loginBanner = document.getElementById('loginBanner');
+    var btnLogin = document.getElementById('btnLogin');
+    var btnTrocarSenha = document.getElementById('btnTrocarSenha');
+    var btnEsqueciSenha = document.getElementById('btnEsqueciSenha');
+    var btnLogout = document.getElementById('btnLogout');
+    var pendingEmail = '';
+    var pendingSenhaAtual = '';
+
+    function showLoginError(msg) {
+      loginBanner.textContent = msg;
+      loginBanner.style.display = 'block';
+    }
+
+    btnLogin.addEventListener('click', function () {
+      var email = document.getElementById('f_loginEmail').value.trim();
+      var senha = document.getElementById('f_loginSenha').value;
+      if (!email || !senha) { showLoginError('Informe e-mail e senha.'); return; }
+      loginBanner.style.display = 'none';
+      btnLogin.disabled = true;
+      btnLogin.innerHTML = '<span class="spinner"></span>Entrando...';
+      callApi_('login', { email: email, senha: senha })
+        .then(function (res) {
+          btnLogin.disabled = false;
+          btnLogin.textContent = 'Entrar';
+          if (res.primeiroLogin) {
+            pendingEmail = email;
+            pendingSenhaAtual = senha;
+            loginForm.classList.add('hidden');
+            trocaSenhaForm.classList.remove('hidden');
+            document.getElementById('loginTitle').textContent = 'Defina sua senha';
+            return;
+          }
+          loadPerfilAndEnter_(email);
+        })
+        .catch(function (err) {
+          btnLogin.disabled = false;
+          btnLogin.textContent = 'Entrar';
+          showLoginError(err.message || String(err));
+        });
+    });
+
+    btnTrocarSenha.addEventListener('click', function () {
+      var novaSenha = document.getElementById('f_novaSenha').value;
+      var novaSenha2 = document.getElementById('f_novaSenha2').value;
+      if (!novaSenha || novaSenha.length < 6) { showLoginError('A nova senha deve ter ao menos 6 caracteres.'); return; }
+      if (novaSenha !== novaSenha2) { showLoginError('As senhas não conferem.'); return; }
+      loginBanner.style.display = 'none';
+      btnTrocarSenha.disabled = true;
+      btnTrocarSenha.innerHTML = '<span class="spinner"></span>Salvando...';
+      callApi_('trocarSenha', { email: pendingEmail, senhaAtual: pendingSenhaAtual, novaSenha: novaSenha })
+        .then(function () {
+          btnTrocarSenha.disabled = false;
+          btnTrocarSenha.textContent = 'Definir senha e entrar';
+          loadPerfilAndEnter_(pendingEmail);
+        })
+        .catch(function (err) {
+          btnTrocarSenha.disabled = false;
+          btnTrocarSenha.textContent = 'Definir senha e entrar';
+          showLoginError(err.message || String(err));
+        });
+    });
+
+    btnEsqueciSenha.addEventListener('click', function () {
+      var email = document.getElementById('f_loginEmail').value.trim();
+      if (!email) { showLoginError('Digite seu e-mail no campo acima e toque em "Esqueci a senha" de novo.'); return; }
+      loginBanner.style.display = 'none';
+      btnEsqueciSenha.disabled = true;
+      callApi_('esqueciSenha', { email: email })
+        .then(function () {
+          btnEsqueciSenha.disabled = false;
+          loginBanner.style.color = '';
+          showLoginError('Enviamos uma nova senha provisória para ' + email + '. Confira seu e-mail.');
+          loginBanner.classList.remove('banner-error');
+          loginBanner.style.background = '#e6f4ea';
+          loginBanner.style.color = '#2e7d32';
+        })
+        .catch(function (err) {
+          btnEsqueciSenha.disabled = false;
+          showLoginError(err.message || String(err));
+        });
+    });
+
+    btnLogout.addEventListener('click', function () {
+      CURRENT_USER = null;
+      appCard.classList.add('hidden');
+      loginCard.classList.remove('hidden');
+      loginForm.classList.remove('hidden');
+      trocaSenhaForm.classList.add('hidden');
+      document.getElementById('loginTitle').textContent = 'Entrar';
+      document.getElementById('f_loginSenha').value = '';
+    });
+
+    function loadPerfilAndEnter_(email) {
+      callApi_('getMeuPerfil', { email: email }).then(finishLogin_).catch(function (err) {
+        showLoginError(err.message || String(err));
+      });
+    }
+
+    function finishLogin_(perfil) {
+      CURRENT_USER = perfil;
+      loginCard.classList.add('hidden');
+      appCard.classList.remove('hidden');
+      document.getElementById('usuarioNomeLabel').textContent = perfil.nome || perfil.email;
+
+      // Pré-preenche Passo 1 com os dados já cadastrados
+      fieldEl('f_email').value = perfil.email || '';
+      fieldEl('f_solicitante').value = perfil.nome || '';
+      fieldEl('f_telefone').value = perfil.telefone || '';
+
+      // Monta o preview do endereço próprio e a lista de supervisores
+      var addrTxt = perfil.endereco ? (perfil.endereco + (perfil.cep ? ' — CEP ' + perfil.cep : '')) : 'Nenhum endereço cadastrado ainda — fale com o time de trade.';
+      document.getElementById('proprioAddrPreview').textContent = addrTxt;
+
+      var supSelect = document.getElementById('f_supervisorSelect');
+      supSelect.innerHTML = '<option value="">Selecione...</option>';
+      (perfil.supervisores || []).forEach(function (s, i) {
+        var opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = s.nome;
+        supSelect.appendChild(opt);
+      });
+
+      lastSubmittedEmail = perfil.email;
+      if (fotoEmailInput) fotoEmailInput.value = perfil.email;
+
+      if (PRESET_ID) fotoIdInput.value = PRESET_ID;
+      showView(INITIAL_VIEW);
+      if (INITIAL_VIEW === 'fotos') buscarMeusPedidos();
+    }
+
+    // ---------------------------------------------------------------
     // Tabs / view switching
     // ---------------------------------------------------------------
     var tabSolicitar = document.getElementById('tabSolicitar');
     var tabFotos = document.getElementById('tabFotos');
+    var tabHistorico = document.getElementById('tabHistorico');
     var viewSolicitar = document.getElementById('viewSolicitar');
     var viewFotos = document.getElementById('viewFotos');
+    var viewHistorico = document.getElementById('viewHistorico');
 
     function showView(view) {
-      if (view === 'fotos') {
-        tabFotos.classList.add('active');
-        tabSolicitar.classList.remove('active');
-        viewFotos.classList.remove('hidden');
-        viewSolicitar.classList.add('hidden');
-      } else {
-        tabSolicitar.classList.add('active');
-        tabFotos.classList.remove('active');
-        viewSolicitar.classList.remove('hidden');
-        viewFotos.classList.add('hidden');
-      }
+      tabSolicitar.classList.toggle('active', view === 'solicitar');
+      tabFotos.classList.toggle('active', view === 'fotos');
+      tabHistorico.classList.toggle('active', view === 'historico');
+      viewSolicitar.classList.toggle('hidden', view !== 'solicitar');
+      viewFotos.classList.toggle('hidden', view !== 'fotos');
+      viewHistorico.classList.toggle('hidden', view !== 'historico');
+      if (view === 'historico') carregarHistorico();
     }
     tabSolicitar.addEventListener('click', function () { showView('solicitar'); });
     tabFotos.addEventListener('click', function () { showView('fotos'); });
+    tabHistorico.addEventListener('click', function () { showView('historico'); });
 
     // ---------------------------------------------------------------
     // Wizard (Solicitar material)
@@ -531,7 +827,7 @@
     var stepFields = {
       1: ['f_email', 'f_solicitante', 'f_telefone', 'f_regiao'],
       2: ['f_rede', 'f_qtdLojas', 'f_periodo', 'f_finalidade'],
-      3: ['f_endereco']
+      3: []
     };
 
     function fieldEl(id) { return document.getElementById(id); }
@@ -650,6 +946,125 @@
       return allOk;
     }
 
+    // ---------------------------------------------------------------
+    // Destinatário (próprio / supervisor / outra localização)
+    // ---------------------------------------------------------------
+    var destProprio = document.getElementById('destProprio');
+    var destSupervisor = document.getElementById('destSupervisor');
+    var destOutro = document.getElementById('destOutro');
+    var supervisorSelect = document.getElementById('f_supervisorSelect');
+    var supervisorAddrPreview = document.getElementById('supervisorAddrPreview');
+    var outroCepInput = document.getElementById('f_outroCep');
+
+    function destinatarioTipoAtual() {
+      var checked = document.querySelector('input[name="destinatarioTipo"]:checked');
+      return checked ? checked.value : 'proprio';
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="destinatarioTipo"]'), function (radio) {
+      radio.addEventListener('change', function () {
+        var tipo = destinatarioTipoAtual();
+        destProprio.classList.toggle('hidden', tipo !== 'proprio');
+        destSupervisor.classList.toggle('hidden', tipo !== 'supervisor');
+        destOutro.classList.toggle('hidden', tipo !== 'outro');
+        Array.prototype.forEach.call(document.querySelectorAll('.radio-option'), function (opt) {
+          opt.classList.toggle('selected', opt.getAttribute('data-tipo') === tipo);
+        });
+        document.getElementById('destinatarioError').style.display = 'none';
+      });
+    });
+
+    supervisorSelect.addEventListener('change', function () {
+      var i = supervisorSelect.value;
+      var sup = i !== '' && CURRENT_USER && CURRENT_USER.supervisores ? CURRENT_USER.supervisores[Number(i)] : null;
+      if (sup) {
+        supervisorAddrPreview.classList.remove('hidden');
+        supervisorAddrPreview.textContent = sup.nome + ' — ' + sup.endereco + (sup.cep ? ' — CEP ' + sup.cep : '');
+        document.getElementById('supervisorError').style.display = 'none';
+      } else {
+        supervisorAddrPreview.classList.add('hidden');
+      }
+    });
+
+    outroCepInput.addEventListener('blur', buscarCep_);
+    outroCepInput.addEventListener('input', function () {
+      var digits = outroCepInput.value.replace(/\D/g, '').slice(0, 8);
+      outroCepInput.value = digits.length > 5 ? digits.slice(0, 5) + '-' + digits.slice(5) : digits;
+      if (digits.length === 8) buscarCep_();
+    });
+
+    function buscarCep_() {
+      var cep = outroCepInput.value.replace(/\D/g, '');
+      if (cep.length !== 8) return;
+      fetch('https://viacep.com.br/ws/' + cep + '/json/')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.erro) return;
+          var partes = [d.logradouro, d.bairro, d.localidade + (d.uf ? ' - ' + d.uf : '')].filter(Boolean);
+          document.getElementById('f_outroEndereco').value = partes.join(', ');
+          document.getElementById('f_outroUf').value = d.uf || '';
+        })
+        .catch(function () { /* CEP não encontrado — deixa o campo editável manualmente */ });
+    }
+
+    function validateDestinatario() {
+      var tipo = destinatarioTipoAtual();
+      if (tipo === 'proprio') {
+        var ok = !!(CURRENT_USER && CURRENT_USER.endereco);
+        document.getElementById('destinatarioError').style.display = ok ? 'none' : 'block';
+        if (!ok) document.getElementById('destinatarioError').textContent = 'Seu endereço ainda não está cadastrado — fale com o time de trade ou escolha outra opção.';
+        return ok;
+      }
+      if (tipo === 'supervisor') {
+        var ok2 = supervisorSelect.value !== '';
+        document.getElementById('supervisorError').style.display = ok2 ? 'none' : 'block';
+        return ok2;
+      }
+      // outro
+      var fields = ['f_outroCep', 'f_outroEndereco', 'f_outroNome', 'f_outroCpf', 'f_outroTelefone'];
+      var allOk = true;
+      fields.forEach(function (id) {
+        var el = fieldEl(id);
+        var ok3 = el.value.trim().length > 0;
+        el.classList.toggle('error', !ok3);
+        var msg = el.parentElement.querySelector('.error-msg');
+        if (msg) msg.style.display = ok3 ? 'none' : 'block';
+        if (!ok3) allOk = false;
+      });
+      return allOk;
+    }
+
+    function destinatarioParaEnvio() {
+      var tipo = destinatarioTipoAtual();
+      if (tipo === 'proprio') {
+        return {
+          destinatarioTipo: 'proprio',
+          destinatarioNome: CURRENT_USER ? CURRENT_USER.nome : '',
+          destinatarioCpf: CURRENT_USER ? CURRENT_USER.cpf : '',
+          destinatarioTelefone: CURRENT_USER ? CURRENT_USER.telefone : '',
+          endereco: CURRENT_USER ? (CURRENT_USER.endereco + (CURRENT_USER.cep ? ' — CEP ' + CURRENT_USER.cep : '')) : ''
+        };
+      }
+      if (tipo === 'supervisor') {
+        var sup = (CURRENT_USER && CURRENT_USER.supervisores && supervisorSelect.value !== '')
+          ? CURRENT_USER.supervisores[Number(supervisorSelect.value)] : null;
+        return {
+          destinatarioTipo: 'supervisor',
+          destinatarioNome: sup ? sup.nome : '',
+          destinatarioCpf: sup ? sup.cpf : '',
+          destinatarioTelefone: sup ? sup.telefone : '',
+          endereco: sup ? (sup.endereco + (sup.cep ? ' — CEP ' + sup.cep : '')) : ''
+        };
+      }
+      return {
+        destinatarioTipo: 'outro',
+        destinatarioNome: fieldEl('f_outroNome').value.trim(),
+        destinatarioCpf: fieldEl('f_outroCpf').value.trim(),
+        destinatarioTelefone: fieldEl('f_outroTelefone').value.trim(),
+        endereco: fieldEl('f_outroEndereco').value.trim() + ' — CEP ' + fieldEl('f_outroCep').value.trim()
+      };
+    }
+
     function validateField(id) {
       var el = fieldEl(id);
       var val = el.value.trim();
@@ -678,12 +1093,14 @@
         if (!validateField(id)) allOk = false;
       });
       if (step === 2 && !validateItems()) allOk = false;
+      if (step === 3 && !validateDestinatario()) allOk = false;
       return allOk;
     }
 
     function updateReview() {
       var data = collectData();
       var list = document.getElementById('reviewList');
+      var tipoLabel = { proprio: 'Para mim mesmo', supervisor: 'Para supervisor', outro: 'Outra localização' }[data.destinatarioTipo] || '-';
       var rows = [
         ['Solicitante', data.solicitante],
         ['E-mail', data.email],
@@ -691,7 +1108,10 @@
         ['Região', data.regiao],
         ['Rede/Loja', data.rede],
         ['Nº de lojas', data.qtdLojas],
-        ['Período', data.periodoCobertura]
+        ['Período', data.periodoCobertura],
+        ['Enviar para', tipoLabel],
+        ['Destinatário', data.destinatarioNome],
+        ['Endereço de entrega', data.endereco]
       ];
       (data.items || []).forEach(function (it, i) {
         rows.push(['Item ' + (i + 1), (it.material || '-') + ' — ' + (it.quantidade || '-') + ' un.']);
@@ -728,7 +1148,7 @@
     });
 
     function collectData() {
-      return {
+      var base = {
         email: fieldEl('f_email').value.trim(),
         solicitante: fieldEl('f_solicitante').value.trim(),
         telefone: fieldEl('f_telefone').value.trim(),
@@ -738,9 +1158,15 @@
         periodoCobertura: fieldEl('f_periodo').value.trim(),
         items: collectItems(),
         finalidade: fieldEl('f_finalidade').value.trim(),
-        endereco: fieldEl('f_endereco').value.trim(),
         observacoes: fieldEl('f_observacoes').value.trim()
       };
+      var dest = destinatarioParaEnvio();
+      base.destinatarioTipo = dest.destinatarioTipo;
+      base.destinatarioNome = dest.destinatarioNome;
+      base.destinatarioCpf = dest.destinatarioCpf;
+      base.destinatarioTelefone = dest.destinatarioTelefone;
+      base.endereco = dest.endereco;
+      return base;
     }
 
     function submitRequest() {
@@ -771,10 +1197,22 @@
     }
 
     document.getElementById('btnNovaSolicitacao').addEventListener('click', function () {
-      ['f_email','f_solicitante','f_telefone','f_regiao','f_rede','f_qtdLojas','f_periodo','f_finalidade','f_endereco','f_observacoes'].forEach(function(id){
+      ['f_regiao','f_rede','f_qtdLojas','f_periodo','f_finalidade','f_observacoes',
+       'f_outroCep','f_outroUf','f_outroEndereco','f_outroNome','f_outroCpf','f_outroTelefone'].forEach(function(id){
         fieldEl(id).value = '';
         fieldEl(id).classList.remove('error');
       });
+      document.querySelector('input[name="destinatarioTipo"][value="proprio"]').checked = true;
+      destProprio.classList.remove('hidden');
+      destSupervisor.classList.add('hidden');
+      destOutro.classList.add('hidden');
+      supervisorSelect.value = '';
+      supervisorAddrPreview.classList.add('hidden');
+      if (CURRENT_USER) {
+        fieldEl('f_email').value = CURRENT_USER.email || '';
+        fieldEl('f_solicitante').value = CURRENT_USER.nome || '';
+        fieldEl('f_telefone').value = CURRENT_USER.telefone || '';
+      }
       document.getElementById('itemsContainer').innerHTML = '';
       addItemRow();
       document.getElementById('stepSuccess').classList.add('hidden');
@@ -793,8 +1231,10 @@
     var btnBuscarPedidos = document.getElementById('btnBuscarPedidos');
     var pedidosAprovadosList = document.getElementById('pedidosAprovadosList');
     var fotoIdInput = document.getElementById('f_fotoId');
-    var fileDrop = document.getElementById('fileDrop');
-    var fileInput = document.getElementById('f_fotoInput');
+    var fileDropGaleria = document.getElementById('fileDropGaleria');
+    var fileDropCamera = document.getElementById('fileDropCamera');
+    var fileInputGaleria = document.getElementById('f_fotoInputGaleria');
+    var fileInputCamera = document.getElementById('f_fotoInputCamera');
     var fileList = document.getElementById('fileList');
     var fotoBanner = document.getElementById('fotoBanner');
     var btnEnviarFotos = document.getElementById('btnEnviarFotos');
@@ -851,9 +1291,16 @@
 
     btnBuscarPedidos.addEventListener('click', buscarMeusPedidos);
 
-    fileDrop.addEventListener('click', function () { fileInput.click(); });
-    fileInput.addEventListener('change', function () {
-      selectedFiles = Array.prototype.slice.call(fileInput.files);
+    fileDropGaleria.addEventListener('click', function () { fileInputGaleria.click(); });
+    fileDropCamera.addEventListener('click', function () { fileInputCamera.click(); });
+    fileInputGaleria.addEventListener('change', function () {
+      selectedFiles = selectedFiles.concat(Array.prototype.slice.call(fileInputGaleria.files));
+      fileInputGaleria.value = '';
+      renderFileList();
+    });
+    fileInputCamera.addEventListener('change', function () {
+      selectedFiles = selectedFiles.concat(Array.prototype.slice.call(fileInputCamera.files));
+      fileInputCamera.value = '';
       renderFileList();
     });
 
@@ -862,10 +1309,17 @@
         fileList.innerHTML = '';
         return;
       }
-      fileList.innerHTML = selectedFiles.map(function (f) {
+      fileList.innerHTML = selectedFiles.map(function (f, i) {
         var kb = Math.round(f.size / 1024);
-        return '<div><span>' + f.name + '</span><span>' + kb + ' KB</span></div>';
+        return '<div><span>' + f.name + '</span><span>' + kb + ' KB &nbsp;<a href="#" data-i="' + i + '" class="removeFile" style="color:var(--danger);text-decoration:none;">remover</a></span></div>';
       }).join('');
+      Array.prototype.forEach.call(fileList.querySelectorAll('.removeFile'), function (a) {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          selectedFiles.splice(Number(a.getAttribute('data-i')), 1);
+          renderFileList();
+        });
+      });
     }
 
     function fileToBase64(file) {
@@ -918,7 +1372,8 @@
 
     document.getElementById('btnNovoEnvioFoto').addEventListener('click', function () {
       selectedFiles = [];
-      fileInput.value = '';
+      fileInputGaleria.value = '';
+      fileInputCamera.value = '';
       renderFileList();
       fotoIdInput.value = '';
       pedidosAprovadosList.innerHTML = '';
@@ -930,6 +1385,51 @@
     });
 
     // ---------------------------------------------------------------
+    // Histórico
+    // ---------------------------------------------------------------
+    var historicoList = document.getElementById('historicoList');
+    var STATUS_BADGE_CLASS = {
+      'Pendente': 'warn',
+      'Aguardando aprovação': 'warn',
+      'Aprovado': 'ok',
+      'Reprovado': 'bad',
+      'Rastreio enviado': 'ok',
+      'Fotos recebidas': 'ok'
+    };
+
+    function carregarHistorico() {
+      if (!CURRENT_USER) return;
+      historicoList.innerHTML = '<p class="pedidos-empty">Carregando...</p>';
+      callApi_('getHistoricoSolicitacoes', { email: CURRENT_USER.email })
+        .then(function (pedidos) {
+          if (!pedidos.length) {
+            historicoList.innerHTML = '<p class="pedidos-empty">Você ainda não fez nenhuma solicitação.</p>';
+            return;
+          }
+          historicoList.innerHTML = pedidos.map(function (p) {
+            var badgeClass = STATUS_BADGE_CLASS[p.status] || '';
+            var fotoBtn = p.podeEnviarFotos
+              ? '<button type="button" class="link-btn" data-id="' + p.id + '" style="margin-top:8px;">' + (p.temFotos ? 'Enviar mais fotos' : 'Enviar fotos da positivação') + ' →</button>'
+              : '';
+            return '<div class="hist-card">' +
+              '<div class="hist-top"><span class="hist-id">' + p.id + '</span><span class="badge-status ' + badgeClass + '">' + p.status + '</span></div>' +
+              '<div class="hist-material">' + (p.material || '') + (p.destinatarioNome ? ' · ' + p.destinatarioNome : '') + '</div>' +
+              fotoBtn +
+              '</div>';
+          }).join('');
+          Array.prototype.forEach.call(historicoList.querySelectorAll('.link-btn[data-id]'), function (btn) {
+            btn.addEventListener('click', function () {
+              fotoIdInput.value = btn.getAttribute('data-id');
+              showView('fotos');
+            });
+          });
+        })
+        .catch(function (err) {
+          historicoList.innerHTML = '<p class="pedidos-empty">Erro ao carregar: ' + (err.message || err) + '</p>';
+        });
+    }
+
+    // ---------------------------------------------------------------
     // Service worker (instalabilidade da PWA)
     // ---------------------------------------------------------------
     if ('serviceWorker' in navigator) {
@@ -939,19 +1439,13 @@
     }
 
     // ---------------------------------------------------------------
-    // Init
+    // Init — a view do app (solicitar/fotos/histórico) só é exibida depois
+    // do login (ver finishLogin_), que também pré-preenche o ID da foto
+    // (PRESET_ID) e os dados do Passo 1.
     // ---------------------------------------------------------------
-    if (PRESET_ID) {
-      fotoIdInput.value = PRESET_ID;
-    }
-    if (AUTH_EMAIL) {
-      fotoEmailInput.value = AUTH_EMAIL;
-      fieldEl('f_email').value = AUTH_EMAIL;
-    }
-    if (fotoEmailInput.value) buscarMeusPedidos();
     addItemRow();
     showStep(1);
-    showView(INITIAL_VIEW);
+    document.querySelector('.radio-option[data-tipo="proprio"]').classList.add('selected');
   </script>
 </body>
 </html>
