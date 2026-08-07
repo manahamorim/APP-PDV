@@ -778,6 +778,7 @@
 
     function finishLogin_(perfil) {
       CURRENT_USER = perfil;
+      if (window.__pendingFcmToken) { window.registrarFcmTokenNativo(window.__pendingFcmToken); window.__pendingFcmToken = null; }
       loginCard.classList.add('hidden');
       appCard.classList.remove('hidden');
       document.getElementById('usuarioNomeLabel').textContent = perfil.nome || perfil.email;
@@ -1452,6 +1453,18 @@
     // ---------------------------------------------------------------
     // Service worker (instalabilidade da PWA)
     // ---------------------------------------------------------------
+          // ---------------------------------------------------------------
+          // FCM (push notifications nativas) - ponte com o app Android
+          // ---------------------------------------------------------------
+          window.__pendingFcmToken = null;
+          window.registrarFcmTokenNativo = function (token) {
+                    if (typeof CURRENT_USER !== 'undefined' && CURRENT_USER && CURRENT_USER.email) {
+                                callApi_('registrarFcmToken', { email: CURRENT_USER.email, token: token }).catch(function () {});
+                    } else {
+                                window.__pendingFcmToken = token;
+                    }
+          };
+    
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
         navigator.serviceWorker.register('service-worker.js').catch(function () {});
