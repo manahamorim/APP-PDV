@@ -1,0 +1,29 @@
+{
+    "project_info": {
+          "project_number": "867911775171",
+          "project_id": "pdv-realme",
+          "storage_bucket": "pdv-realme.firebasestorage.app"
+    },
+    "client": [
+          {
+                  "client_info": {
+                            "mobilesdk_app_id": "1:867911775171:android:b7fa7af1c1a68becf48376",
+                            "android_client_info": {
+                                        "package_name": "com.realme.positivacao"
+                            }
+                  },
+                  "oauth_client": [],
+                  "api_key": [
+                            {
+                                        "current_key": "AIzaSyASySVEvLG169rr9gYiOTkgvBUSfuFOp0M"
+                            }
+                  ],
+                  "services": {
+                            "appinvite_service": {
+                                        "other_platform_oauth_client": []
+                            }
+                  }
+          }
+    ],
+    "configuration_version": "1"
+}
